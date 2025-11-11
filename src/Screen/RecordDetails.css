@@ -55,6 +55,7 @@
 
 .three-cols {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 10px 0;
 }
 
 .user-info {
@@ -138,7 +139,7 @@
 }
 
 .field input {
-   width: calc(100% - 30px);
+  width: calc(100% - 30px);
   padding: 7px 15px;
   border-radius: 4px;
   font-size: 14px;

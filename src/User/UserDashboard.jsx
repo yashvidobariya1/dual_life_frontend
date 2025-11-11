@@ -172,17 +172,16 @@ const UserDashboard = () => {
                   healthResults.map((testItem) => (
                     <div className="test-item">
                       <div>
-                        <h3>{testItem.name}</h3>
-                        <p>Normal range: {testItem.value}</p>
+                        <h3>{testItem.value}</h3>
+                        {/* <p>{testItem.value}</p> */}
                       </div>
                       <div className="item-content">
-                        <strong>
-                          {testItem.value}
-                          {/* <p> {testItem.value}</p> */}
-                        </strong>
-                        <h4 className="normal-range-dashboard">
+                        {/* <strong> */}
+                        {testItem.value} - <p> {testItem.status}</p>
+                        {/* </strong> */}
+                        <p className="normal-range-dashboard">
                           {healthResults.status}
-                        </h4>
+                        </p>
                       </div>
                     </div>
                   ))
@@ -295,7 +294,7 @@ const UserDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <p>
+                  {/* <p>
                     <strong>Hemoglobin:</strong>{" "}
                     {healthResults?.hemoglobin?.value}{" "}
                     {healthResults?.hemoglobin?.unit}
@@ -310,7 +309,25 @@ const UserDashboard = () => {
                   <p>
                     <strong>Sickle Cell:</strong>{" "}
                     {healthResults?.sickleCell?.result}
-                  </p>
+                  </p> */}
+
+                  {healthResults && (
+                    <div>
+                      {healthResults?.length > 0 ? (
+                        healthResults.map((testItem) => (
+                          <div className="test-item1" key={testItem.id}>
+                            {/* <div> */}
+                            <strong>Test Name</strong> <p>{testItem.name}</p> -{" "}
+                            <p>{testItem.value} - </p>
+                            <p>{testItem.status}</p>
+                          </div>
+                          // </div>
+                        ))
+                      ) : (
+                        <p>No test data available</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

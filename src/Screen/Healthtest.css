@@ -167,6 +167,12 @@
   cursor: pointer;
 }
 
+.action-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 @media (max-width: 500px) {
   .modal-box {
     width: 300px;

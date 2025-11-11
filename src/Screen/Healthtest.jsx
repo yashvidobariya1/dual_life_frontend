@@ -31,6 +31,19 @@ const HealthTest = () => {
     options: [],
   });
 
+  const protectedTests = [
+    "Hemoglobin",
+    "Glucose",
+    "Blood Group",
+    "Sickle cell",
+  ];
+
+  const isProtected = (name) => {
+    return protectedTests.some(
+      (test) => test.toLowerCase().trim() === name.toLowerCase().trim()
+    );
+  };
+
   const validateField = (name, value) => {
     let error = "";
 
@@ -374,8 +387,19 @@ const HealthTest = () => {
                         <FaEdit />
                       </div>
                       <div
-                        onClick={() => handleDelete(record._id)}
-                        className="action-btn delete-btn-action"
+                        className={`action-btn delete-btn-action ${
+                          isProtected(record.name) ? "disabled" : ""
+                        }`}
+                        onClick={() => {
+                          if (isProtected(record.name)) {
+                            showToast(
+                              `${record.name} cannot be deleted.`,
+                              "error"
+                            );
+                            return;
+                          }
+                          handleDelete(record._id);
+                        }}
                       >
                         <FaTrash />
                       </div>

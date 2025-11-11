@@ -33,7 +33,16 @@
 }
 
 .item-content {
-  text-align: end;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.test-item1 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .item-content strong {
