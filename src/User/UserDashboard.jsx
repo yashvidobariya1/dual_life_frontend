@@ -172,7 +172,7 @@ const UserDashboard = () => {
                   healthResults.map((testItem) => (
                     <div className="test-item">
                       <div>
-                        <h3>{testItem.value}</h3>
+                        <h3>{testItem.testName}</h3>
                         {/* <p>{testItem.value}</p> */}
                       </div>
                       <div className="item-content">
@@ -317,7 +317,8 @@ const UserDashboard = () => {
                         healthResults.map((testItem) => (
                           <div className="test-item1" key={testItem.id}>
                             {/* <div> */}
-                            <strong>Test Name</strong> <p>{testItem.name}</p> -{" "}
+                            {/* <strong>Test Name</strong>{" "} */}
+                            <p>{testItem.testName}</p> -{" "}
                             <p>{testItem.value} - </p>
                             <p>{testItem.status}</p>
                           </div>
