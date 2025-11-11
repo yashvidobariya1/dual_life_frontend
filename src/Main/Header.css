@@ -1,0 +1,111 @@
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray-bg);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--black-color);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Notification Bell */
+.notification {
+  position: relative;
+  font-size: 20px;
+  color: var(--gray-color);
+  cursor: pointer;
+}
+
+.notification .badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--danger-color);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 50%;
+}
+
+/* Profile */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.profile img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.header-toggle-menu {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--success-bg);
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+}
+
+.dropdown-menu button:hover {
+  background: var(--gray-bg);
+}
+
+@media (max-width: 600px) {
+  .logo {
+    font-size: 14px;
+  }
+
+  .username {
+    font-size: 10px;
+  }
+
+  .main-header {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .header-toggle-menu {
+    gap: 8px;
+  }
+}

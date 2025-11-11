@@ -1,0 +1,278 @@
+.dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* --- Stats Section --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--white);
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  gap: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  padding: 12px;
+  border-radius: 6px;
+  color: var(--white);
+  font-size: 20px;
+}
+
+.icon.blue {
+  background: var(--primary-hover);
+}
+.icon.green {
+  background: var(--green-color);
+}
+.icon.orange {
+  background: var(--yellow-color);
+}
+.icon.red {
+  background: var(--danger-color);
+}
+
+.info .label {
+  font-size: 16px;
+  color: var(--black-color);
+  margin: 8px 0;
+  /* color: var(--gray-bg); */
+}
+
+.info .value {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 4px 0;
+  color: var((--black-color));
+}
+
+.quick-actions {
+  margin-top: 30px;
+}
+.quick-actions h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.quick-btn {
+  display: flex;
+  align-items: center;
+  background: var(--white);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-light);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.quick-btn:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quick-icon {
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 6px;
+  margin-right: 12px;
+  color: var(--white);
+}
+
+.quick-icon.blue {
+  background: #93c5fd;
+  color: var(--primary-hover);
+}
+.quick-icon.green {
+  background: #bbf7d0;
+  color: var(--green-color);
+}
+.quick-icon.purple {
+  background: #e9d5ff;
+  color: var(--purple-color);
+}
+
+.title-dashboard {
+  font-weight: bold;
+  font-size: 14px;
+  margin: 6px 0;
+}
+.subtitle {
+  font-size: 13px;
+  margin: 4px 0;
+  color: var(--gray-color);
+}
+
+.recent-records {
+  margin-top: 30px;
+}
+.recent-records h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.record {
+  background: var(--white);
+  padding: 14px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-bg);
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.aadhaar-details {
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+.status {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.status.approved {
+  background: #dcfce7;
+  color: var(--green-color);
+}
+.status.pending {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.status.rejected {
+  background: #fee2e2;
+  color: var(--rejected-color);
+}
+
+.record-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.dashboard-content {
+  text-align: left;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  z-index: 10000;
+  position: relative;
+}
+
+.popup input {
+  width: calc(100% - 16px);
+  padding: 7px 15px;
+  border-radius: 4px;
+  margin: 12px 0;
+  border: 1px solid var(--gray-light);
+}
+
+.popup-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--gray-color);
+}
+
+.popup-close:hover {
+  color: var(--black-color);
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popup .btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn.add {
+  background: var(--green-color);
+  color: var(--white);
+}
+
+.btn.remove {
+  background: var(--rejected-color);
+  color: var(--white);
+}
+
+.btn.cancel {
+  background: var(--gray-color);
+  color: var(--white);
+}
+
+.popup h3 {
+  margin: 4px 0;
+}
+
+.records-flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.records-all {
+  height: max-content;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+  .info .label {
+    font-size: 14px;
+  }
+}

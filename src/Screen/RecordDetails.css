@@ -1,0 +1,211 @@
+.test-details-container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.card-testdetails {
+  margin-top: 24px;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 30px;
+}
+
+.card-testdetails-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.card-testdetails-body {
+  padding: 16px;
+}
+
+.card-testdetails-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  background: var(--gray-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.two-cols {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.three-cols {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.user-aadhaar {
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.address {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.label {
+  font-weight: 600;
+  color: var(--black-color);
+}
+
+.doc-box {
+  background: var(--gray-light);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.doc-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.doc-item {
+  border: 1px solid var(--gray-bg);
+  border-radius: 6px;
+  padding: 6px;
+  text-align: center;
+}
+
+.doc-item img {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.doc-item p {
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--gray-color);
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--gray-color);
+}
+
+.field input {
+   width: calc(100% - 30px);
+  padding: 7px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  background: var(--gray-bg);
+}
+
+.status {
+  font-size: 14px;
+  color: var(--gray-color);
+}
+
+.badge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.badge.pending {
+  background: var(--pending-bg);
+  color: var(--yellow-color);
+}
+
+.submitted {
+  font-size: 13px;
+  color: var(--gray-color);
+  margin-top: 4px;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-back,
+.btn-pending {
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  color: var(--gray-color);
+}
+
+.btn-approve {
+  background: var(--green-color);
+  color: var(--white);
+}
+
+.btn-approve:hover {
+  background: var(--green-color);
+}
+
+.btn-reject {
+  background: var(--rejected-color);
+  color: var(--white);
+}
+
+.btn-reject:hover {
+  background: var(--rejected-color);
+}
+
+.btn-back:hover,
+.btn-pending:hover {
+  background: var(--white);
+}
