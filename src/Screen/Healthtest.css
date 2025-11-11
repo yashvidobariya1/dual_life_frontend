@@ -168,7 +168,7 @@
 }
 
 .action-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   pointer-events: none;
   cursor: not-allowed;
 }
