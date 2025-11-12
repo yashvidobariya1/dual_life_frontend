@@ -256,14 +256,11 @@ const SubAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit");
 
     if (!validateForm()) {
       showToast("Please fix form errors before submitting", "error");
       return;
     }
-
-    console.log("validateForm", validateForm());
 
     const body = {
       aadhaarNumber: formData.aadhaar,
@@ -283,19 +280,21 @@ const SubAdmin = () => {
         res = await PostCall("auth/register-subadmin", body);
       }
 
+      console.log("API Response:", res);
+
       if (res?.success) {
-        showToast(
-          isEditMode
-            ? "Sub-admin updated successfully!"
-            : "Sub-admin registered successfully!",
-          "success"
-        );
+        showToast(res?.message || "Sub-admin saved successfully!", "success");
         resetAll();
       } else {
-        showToast(res?.message || "Failed to save Sub-admin", "error");
+        showToast(res?.message || "Something went wrong!", "error");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error:", err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "An unexpected error occurred.";
+      showToast(errorMessage, "error");
     }
   };
 
