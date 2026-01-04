@@ -266,8 +266,90 @@
   padding: 20px;
 }
 
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.date-filter label {
+  font-weight: bold;
+}
+
+.date-filter input[type="date"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 @media (max-width: 800px) {
   .health-card-container {
     flex-direction: column;
+  }
+}
+
+.logout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Dropdown */
+.report-dropdown {
+  min-width: 240px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #d0d7de;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-dropdown:hover {
+  border-color: #3b82f6;
+}
+
+.report-dropdown:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Logout Button */
+.logout-btn {
+  padding: 10px 18px;
+  background: var(--green-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.logout-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .logout-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .report-dropdown,
+  .logout-btn {
+    width: 100%;
   }
 }

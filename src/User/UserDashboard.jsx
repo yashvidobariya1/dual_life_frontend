@@ -13,6 +13,9 @@ const UserDashboard = () => {
   const id = localStorage.getItem("adharnumber");
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [patientId, setPatientId] = useState("");
+  const [reportList, setReportList] = useState([]);
+  const [selectedReportId, setSelectedReportId] = useState("");
   const Navigate = useNavigate();
   const cardRef = useRef();
 
@@ -79,23 +82,89 @@ const UserDashboard = () => {
           }
         );
 
-        const data = await response.json(); // parse JSON once
+        const data = await response.json();
 
         if (response.ok && data.success && data.reports?.length > 0) {
-          setReportData(data.reports[0]); // set first report
+          setReportData(data.reports[0]);
+          setSelectedReportId(data.reports[0].patient._id);
+          console.log("Fetched Report Data:", data.reports[0].patient._id);
         } else {
-          setReportData(null); // no data case
+          setReportData(null);
         }
       } catch (error) {
         console.error("Error fetching report:", error);
         setReportData(null);
       } finally {
-        setLoading(false); // stop loading in all cases
+        setLoading(false);
       }
     };
 
     fetchReportData();
   }, [id]);
+
+  const handlelogout = () => {
+    localStorage.clear();
+    localStorage.removeItem("adharverifytoken");
+    localStorage.removeItem("adharnumber");
+    Navigate("/");
+  };
+
+  useEffect(() => {
+    if (!selectedReportId) return;
+    console.log("Selected Report ID:", selectedReportId);
+    const fetchReportList = async () => {
+      try {
+        const res = await fetch(
+          `https://duallife-backend.vercel.app/report/list/${selectedReportId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setReportList(data.reports);
+        }
+      } catch (err) {
+        console.error("Report list error", err);
+      }
+    };
+
+    fetchReportList();
+  }, [selectedReportId]);
+
+  useEffect(() => {
+    if (!patientId) return;
+    console.log("Selected Report ID:", patientId);
+    const fetchReportList = async () => {
+      try {
+        setLoading(true); // start loading
+        const res = await fetch(
+          `https://duallife-backend.vercel.app/report/${patientId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setReportData(data.reports[0]);
+        }
+      } catch (err) {
+        console.error("Report list error", err);
+      }
+    };
+    fetchReportList();
+    setLoading(false); // end loading
+  }, [patientId]);
 
   if (!reportData) return <Loader />;
 
@@ -104,13 +173,6 @@ const UserDashboard = () => {
   if (loading) {
     return <Loader />;
   }
-
-  const handlelogout = () => {
-    localStorage.clear();
-    localStorage.removeItem("adharverifytoken");
-    localStorage.removeItem("adharnumber");
-    Navigate("/");
-  };
 
   return (
     <div className="adharverfiy-div">
@@ -128,9 +190,28 @@ const UserDashboard = () => {
         </header>
 
         <div className="results">
-          <div className="logout">
-            <button onClick={handlelogout}>Logout</button>
+          <div className="logout-bar">
+            <select
+              value={selectedReportId}
+              onChange={(e) => setSelectedReportId(e.target.value)}
+              className="report-dropdown"
+            >
+              <option value="">📄 Select Report</option>
+
+              {reportList?.map((report, index) => (
+                <option key={report._id} value={report._id}>
+                  {report.createdAt
+                    ? new Date(report.createdAt).toLocaleDateString()
+                    : report._id}
+                </option>
+              ))}
+            </select>
+
+            <button className="logout-btn" onClick={handlelogout}>
+              Logout
+            </button>
           </div>
+
           <div className="card-adhar user-card-adhar">
             <div className="card-detialls">
               <img
