@@ -231,7 +231,7 @@ const UserDashboard = () => {
                   {new Date(patient?.dateOfBirth).toLocaleDateString()}
                 </p>
                 <p>
-                  <strong>Blood Group:</strong> {healthResults?.bloodGroup}
+                  {/* <strong>Blood Group:</strong> {healthResults?.bloodGroup} */}
                 </p>
               </div>
             </div>
