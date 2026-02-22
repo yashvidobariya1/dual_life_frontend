@@ -11,65 +11,24 @@ import { saveAs } from "file-saver";
 
 const UserDashboard = () => {
   const id = localStorage.getItem("adharnumber");
+
   const [reportData, setReportData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [patientId, setPatientId] = useState("");
   const [reportList, setReportList] = useState([]);
   const [selectedReportId, setSelectedReportId] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const Navigate = useNavigate();
   const cardRef = useRef();
 
   const getToken = () => {
-    const token = JSON.parse(localStorage.getItem("adharverifytoken"));
-    console.log("token", token);
-    return token;
+    return JSON.parse(localStorage.getItem("adharverifytoken"));
   };
 
-  const downloadPDF = async () => {
-    const pdf = new jsPDF("p", "mm", "a4");
-    const margin = 10;
-    const gap = 15;
-
-    // FRONT
-    const frontElement = document.querySelector(".health-card.front");
-    const frontCanvas = await html2canvas(frontElement, { scale: 1.5 });
-    const frontImg = frontCanvas.toDataURL("image/png");
-    const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
-    const frontHeight = (frontCanvas.height * pdfWidth) / frontCanvas.width;
-
-    // BACK
-    const backElement = document.querySelector(".health-card.back");
-    const backCanvas = await html2canvas(backElement, { scale: 1.5 });
-    const backImg = backCanvas.toDataURL("image/png");
-    const backHeight = (backCanvas.height * pdfWidth) / backCanvas.width;
-
-    // Add to PDF
-    let y = margin;
-    pdf.addImage(frontImg, "PNG", margin, y, pdfWidth, frontHeight);
-    y += frontHeight + gap;
-    pdf.addImage(backImg, "PNG", margin, y, pdfWidth, backHeight);
-
-    // Create blob
-    const pdfBlob = pdf.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-
-    // Detect iOS Safari
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-    if (isIOS) {
-      // Open in new tab (works in iOS Safari)
-      window.open(pdfUrl, "_blank");
-    } else {
-      // Normal download (desktop + Android)
-      saveAs(pdfBlob, "health-card.pdf");
-    }
-  };
-
+  // ================= FETCH REPORTS =================
   useEffect(() => {
     const fetchReportData = async () => {
       try {
-        setLoading(true); // start loading
+        setLoading(true);
 
         const response = await fetch(
           `https://duallife-backend.vercel.app/report/by-aadhaar/${id}`,
@@ -79,109 +38,170 @@ const UserDashboard = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${getToken()}`,
             },
-          }
+          },
         );
 
         const data = await response.json();
 
         if (response.ok && data.success && data.reports?.length > 0) {
-          setReportData(data.reports[0]);
-          setSelectedReportId(data.reports[0].patient._id);
-          console.log("Fetched Report Data:", data.reports[0].patient._id);
+          // Sort by latest createdAt
+          const sortedReports = data.reports.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          );
+
+          setReportList(sortedReports);
+
+          // Set latest report by default
+          setReportData(sortedReports[0]);
+          setSelectedReportId(sortedReports[0]._id);
         } else {
+          setReportList([]);
           setReportData(null);
         }
       } catch (error) {
-        console.error("Error fetching report:", error);
+        console.error("Error fetching reports:", error);
+        setReportList([]);
         setReportData(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReportData();
+    if (id) fetchReportData();
   }, [id]);
 
+  // ================= HANDLE DROPDOWN CHANGE =================
+  const handleReportChange = (e) => {
+    const selectedId = e.target.value;
+    setSelectedReportId(selectedId);
+
+    const selectedReport = reportList.find(
+      (report) => report._id === selectedId,
+    );
+
+    if (selectedReport) {
+      setReportData(selectedReport);
+    }
+  };
+
+  // ================= LOGOUT =================
   const handlelogout = () => {
     localStorage.clear();
-    localStorage.removeItem("adharverifytoken");
-    localStorage.removeItem("adharnumber");
     Navigate("/");
   };
 
-  useEffect(() => {
-    if (!selectedReportId) return;
-    console.log("Selected Report ID:", selectedReportId);
-    const fetchReportList = async () => {
-      try {
-        const res = await fetch(
-          `https://duallife-backend.vercel.app/report/list/${selectedReportId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getToken()}`,
-            },
-          }
+  // ================= DOWNLOAD PDF =================
+  const downloadPDF = async () => {
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const margin = 5;
+    const pageHeight = pdf.internal.pageSize.getHeight() - margin * 2;
+    const pdfWidth = pdf.internal.pageSize.getWidth() - margin * 2;
+
+    const frontElement = document.querySelector(".health-card.front");
+    const backElement = document.querySelector(".health-card.back");
+
+    if (!frontElement || !backElement) {
+      console.error("Health card elements not found");
+      return;
+    }
+
+    try {
+      const frontCanvas = await html2canvas(frontElement, {
+        scale: 2,
+        useCORS: true,
+      });
+      const backCanvas = await html2canvas(backElement, {
+        scale: 2,
+        useCORS: true,
+      });
+
+      const frontHeight = (frontCanvas.height * pdfWidth) / frontCanvas.width;
+      const backHeight = (backCanvas.height * pdfWidth) / backCanvas.width;
+
+      let currentPage = 1;
+      let y = margin;
+
+      // ===== ADD FRONT CARD =====
+      if (y + frontHeight <= pageHeight) {
+        pdf.addImage(
+          frontCanvas.toDataURL("image/png"),
+          "PNG",
+          margin,
+          y,
+          pdfWidth,
+          frontHeight,
         );
-
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          setReportList(data.reports);
-        }
-      } catch (err) {
-        console.error("Report list error", err);
-      }
-    };
-
-    fetchReportList();
-  }, [selectedReportId]);
-
-  useEffect(() => {
-    if (!patientId) return;
-    console.log("Selected Report ID:", patientId);
-    const fetchReportList = async () => {
-      try {
-        setLoading(true); // start loading
-        const res = await fetch(
-          `https://duallife-backend.vercel.app/report/${patientId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${getToken()}`,
-            },
-          }
+        y += frontHeight + 15; // Add spacing between cards
+      } else {
+        pdf.addPage();
+        currentPage++;
+        y = margin;
+        pdf.addImage(
+          frontCanvas.toDataURL("image/png"),
+          "PNG",
+          margin,
+          y,
+          pdfWidth,
+          frontHeight,
         );
-
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          setReportData(data.reports[0]);
-        }
-      } catch (err) {
-        console.error("Report list error", err);
+        y += frontHeight;
       }
-    };
-    fetchReportList();
-    setLoading(false); // end loading
-  }, [patientId]);
 
+      // ===== ADD BACK CARD =====
+      if (y + backHeight <= pageHeight) {
+        pdf.addImage(
+          backCanvas.toDataURL("image/png"),
+          "PNG",
+          margin,
+          y,
+          pdfWidth,
+          backHeight,
+        );
+      } else {
+        pdf.addPage();
+        y = margin;
+        pdf.addImage(
+          backCanvas.toDataURL("image/png"),
+          "PNG",
+          margin,
+          y,
+          pdfWidth,
+          backHeight,
+        );
+      }
+
+      // ===== ADD DOWNLOAD DATE TEXT =====
+      const downloadDate = new Date().toLocaleDateString();
+      let yFooter = y + backHeight;
+
+      if (yFooter > pageHeight) {
+        pdf.addPage();
+        yFooter = margin;
+      }
+
+      pdf.setFontSize(10);
+      pdf.text(`Downloaded At: ${downloadDate}`, margin, yFooter + 7);
+
+      pdf.save(`${downloadDate} health-card.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
+
+  // ================= LOADING =================
+  if (loading) return <Loader />;
   if (!reportData) return <Loader />;
 
   const { patient, healthResults, testImages } = reportData;
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <div className="adharverfiy-div">
       <div className="dashboard-portal-container">
+        {/* HEADER */}
         <header className="portal-header">
           <div className="icon-circle">
-            <i className="fa-heartbeat">
-              <MdHealthAndSafety />
-            </i>
+            <MdHealthAndSafety />
           </div>
           <h1>Dual Life Science Healthcare Portal</h1>
           <p>
@@ -189,193 +209,155 @@ const UserDashboard = () => {
           </p>
         </header>
 
-        <div className="results">
-          <div className="logout-bar">
-            <select
-              value={selectedReportId}
-              onChange={(e) => setSelectedReportId(e.target.value)}
-              className="report-dropdown"
-            >
-              <option value="">📄 Select Report</option>
+        {/* DROPDOWN + LOGOUT */}
+        <div className="logout-bar">
+          <select
+            value={selectedReportId}
+            onChange={handleReportChange}
+            className="report-dropdown"
+          >
+            {reportList.map((report) => (
+              <option key={report._id} value={report._id}>
+                {new Date(report.createdAt).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
 
-              {reportList?.map((report, index) => (
-                <option key={report._id} value={report._id}>
-                  {report.createdAt
-                    ? new Date(report.createdAt).toLocaleDateString()
-                    : report._id}
-                </option>
-              ))}
-            </select>
+          <button className="logout-btn" onClick={handlelogout}>
+            Logout
+          </button>
+        </div>
 
-            <button className="logout-btn" onClick={handlelogout}>
-              Logout
-            </button>
-          </div>
-
-          <div className="card-adhar user-card-adhar">
-            <div className="card-detialls">
-              <img
-                src={
-                  patient?.photo
-                    ? `data:image/jpeg;base64,${patient.photo}`
-                    : "/image/123.jpg"
-                }
-                alt="User"
-                className="user-photo"
-              />
-              <div className="user-details">
-                <h2>{patient?.name}</h2>
-                <p>{patient?.address}</p>
-                <p>
-                  <strong>DOB:</strong>{" "}
-                  {new Date(patient?.dateOfBirth).toLocaleDateString()}
-                </p>
-                <p>
-                  {/* <strong>Blood Group:</strong> {healthResults?.bloodGroup} */}
-                </p>
-              </div>
-            </div>
-            <button className="download-btn">
-              <FaRegFilePdf />
-              <h6 onClick={downloadPDF}> Download Health Card</h6>
-            </button>
-          </div>
-          <div className="card-adhar">
-            <h2>
-              <i className="icon-latest-dashbaord">
-                <MdOutlineScience />
-              </i>{" "}
-              Latest Test Results
-            </h2>
-            {healthResults && (
-              <div>
-                {healthResults?.length > 0 ? (
-                  healthResults.map((testItem) => (
-                    <div className="test-item">
-                      <div>
-                        <h3>{testItem.testName}</h3>
-                        {/* <p>{testItem.value}</p> */}
-                      </div>
-                      <div className="item-content">
-                        {/* <strong> */}
-                        {testItem.value} - <p> {testItem.status}</p>
-                        {/* </strong> */}
-                        <p className="normal-range-dashboard">
-                          {healthResults.status}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No test data available</p>
-                )}
-
-                {/* {healthResults.glucose && (
-                  <div className="test-item">
-                    <div>
-                      <h3>Glucose</h3>
-                      <p>
-                        Normal range: {healthResults.glucose.normalRange.min}-
-                        {healthResults.glucose.normalRange.max}{" "}
-                        <p>{healthResults.glucose.unit}</p>
-                      </p>
-                    </div>
-                    <div className="item-content">
-                      <strong>
-                        {healthResults.glucose.value}{" "}
-                        <p>{healthResults.glucose.unit}</p>
-                      </strong>
-                      <h4 className="normal-range-dashboard">
-                        {healthResults.glucose.status}
-                      </h4>
-                    </div>
-                  </div>
-                )}
-
-                {healthResults.sickleCell && (
-                  <div className="test-item">
-                    <div>
-                      <h3>Sickle Cell</h3>
-                      <p>Result: {healthResults.sickleCell.result}</p>
-                    </div>
-                    <div className="item-content">
-                      <p>{healthResults.sickleCell.status}</p>
-                    </div>
-                  </div>
-                )} */}
-              </div>
-            )}
-          </div>
-          <div className="card-adhar">
-            <h2>
-              <div className="camera-record">
-                <FaCamera className="icon-camera" />
-                Test Device Images
-              </div>
-            </h2>
-            <div className="image-grid">
-              {testImages?.map((img, i) => (
-                <div key={i} className="image-card-adhar">
-                  <img
-                    src={`data:image/png;base64,${img.imageData}`}
-                    alt={img.imageType}
-                  />
-                  <p>{img.imageType}</p>
-                </div>
-              ))}
+        {/* PATIENT CARD */}
+        <div className="card-adhar user-card-adhar">
+          <div className="card-detialls">
+            <img
+              src={
+                patient?.photo
+                  ? `data:image/jpeg;base64,${patient.photo}`
+                  : "/image/123.jpg"
+              }
+              alt="User"
+              className="user-photo"
+            />
+            <div className="user-details">
+              <h2>{patient?.name}</h2>
+              <p>{patient?.address}</p>
+              <p>
+                <strong>DOB:</strong>{" "}
+                {new Date(patient?.dateOfBirth).toLocaleDateString()}
+              </p>
             </div>
           </div>
-          <div className="card-adhar">
-            <h2>
-              <div className="camera-record">
-                <FaIdCard className="icon-camera" />
-                Health Card Preview
-              </div>
-            </h2>
-            <div className="image-grid-card">
-              <div className="health-card-container" ref={cardRef}>
-                <div className="health-card front">
-                  <div className="card-title">
-                    <div className="flex-card">
-                      <div className="card-icon">
-                        <FaLandmarkFlag className="mark-icon" />
-                      </div>
-                      <div className="card-content">
-                        <h3>Tribal Development Department</h3>
-                        <p>Goverment of Country Name</p>
-                      </div>
-                    </div>
-                  </div>
-                  <p>
-                    <strong>Name:</strong> {patient?.name}
-                  </p>
-                  <p>
-                    <strong>Age:</strong> {patient?.age || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Gender:</strong> {patient?.gender || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Address:</strong> {patient?.address}
-                  </p>
-                  <p>
-                    <strong>Caste:</strong> {patient?.caste || "N/A"}
-                  </p>
-                </div>
 
-                <div className="health-card back">
-                  <div className="card-title">
-                    <div className="flex-card">
-                      <div className="card-icon">
-                        <FaLandmarkFlag className="mark-icon" />
-                      </div>
-                      <div className="card-content">
-                        <h3>Tribal Development Department</h3>
-                        <p>Goverment of Country Name</p>
-                      </div>
+          <button className="download-btn" onClick={downloadPDF}>
+            <FaRegFilePdf /> Download Health Card
+          </button>
+        </div>
+
+        {/* TEST RESULTS */}
+        <div className="card-adhar">
+          <h2>
+            <MdOutlineScience /> Test Results
+          </h2>
+
+          {healthResults?.length > 0 ? (
+            healthResults.map((test) => (
+              <div className="test-item" key={test._id}>
+                <h3>{test.testName}</h3>
+                <p>
+                  {test.value} - {test.status}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>No test data available</p>
+          )}
+        </div>
+
+        {/* TEST IMAGES */}
+        <div className="card-adhar">
+          <h2>
+            <FaCamera /> Test Device Images
+          </h2>
+          <div className="image-grid">
+            {testImages?.map((img, i) => (
+              <div key={i} className="image-card-adhar">
+                <img
+                  src={`data:image/png;base64,${img.imageData}`}
+                  alt={img.imageType}
+                />
+                <p>{img.imageType}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card-adhar">
+          <h2>
+            <div className="camera-record">
+              <FaIdCard className="icon-camera" />
+              Health Card Preview
+            </div>
+          </h2>
+          <div className="image-grid-card">
+            <div className="health-card-container" ref={cardRef}>
+              <div className="health-card front">
+                <p>
+                  Create At -
+                  {patient?.createdAt
+                    ? new Date(patient.createdAt).toLocaleDateString()
+                    : ""}
+                </p>
+
+                <p className="download-date-info">
+                  Download At -
+                  {patient?.downloadedAt
+                    ? new Date(patient.downloadedAt).toLocaleDateString()
+                    : ""}
+                </p>
+
+                <div className="card-title">
+                  <div className="flex-card">
+                    <div className="card-icon">
+                      <FaLandmarkFlag className="mark-icon" />
+                    </div>
+                    <div className="card-content">
+                      <h3>Tribal Development Department</h3>
+                      <p>Goverment of Country Name</p>
                     </div>
                   </div>
-                  {/* <p>
+                </div>
+                <p>
+                  <strong>Name:</strong> {patient?.name}
+                </p>
+                <p>
+                  <strong>Age:</strong> {patient?.age || "N/A"}
+                </p>
+                <p>
+                  <strong>Gender:</strong> {patient?.gender || "N/A"}
+                </p>
+                <p>
+                  <strong>Address:</strong> {patient?.address}
+                </p>
+                <p>
+                  <strong>Caste:</strong> {patient?.caste || "N/A"}
+                </p>
+              </div>
+
+              <div className="health-card back">
+                <div className="card-title">
+                  <div className="flex-card">
+                    <div className="card-icon">
+                      <FaLandmarkFlag className="mark-icon" />
+                    </div>
+                    <div className="card-content">
+                      <h3>Tribal Development Department</h3>
+                      <p>Goverment of Country Name</p>
+                    </div>
+                  </div>
+                </div>
+                {/* <p>
                     <strong>Hemoglobin:</strong>{" "}
                     {healthResults?.hemoglobin?.value}{" "}
                     {healthResults?.hemoglobin?.unit}
@@ -392,37 +374,36 @@ const UserDashboard = () => {
                     {healthResults?.sickleCell?.result}
                   </p> */}
 
-                  {healthResults && (
-                    <div>
-                      {healthResults?.length > 0 ? (
-                        healthResults.map((testItem) => (
-                          <div className="test-item1" key={testItem.id}>
-                            {/* <div> */}
-                            {/* <strong>Test Name</strong>{" "} */}
-                            <p>{testItem.testName}</p> -{" "}
-                            <p>{testItem.value} - </p>
-                            <p>{testItem.status}</p>
-                          </div>
-                          // </div>
-                        ))
-                      ) : (
-                        <p>No test data available</p>
-                      )}
-                    </div>
-                  )}
-                </div>
+                {healthResults && (
+                  <div>
+                    {healthResults?.length > 0 ? (
+                      healthResults.map((testItem) => (
+                        <div className="test-item1" key={testItem.id}>
+                          {/* <div> */}
+                          {/* <strong>Test Name</strong>{" "} */}
+                          <p>{testItem.testName}</p> -{" "}
+                          <p>{testItem.value} - </p>
+                          <p>{testItem.status}</p>
+                        </div>
+                        // </div>
+                      ))
+                    ) : (
+                      <p>No test data available</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-
-        <footer className="portal-footer">
-          <p>
-            © 2023 Dual Life Science Healthcare Platform. All rights reserved.
-          </p>
-          <p>Secured with Aadhaar authentication • Data privacy compliant</p>
-        </footer>
       </div>
+
+      <footer className="portal-footer">
+        <p>
+          © 2023 Dual Life Science Healthcare Platform. All rights reserved.
+        </p>
+        <p>Secured with Aadhaar authentication • Data privacy compliant</p>
+      </footer>
     </div>
   );
 };
